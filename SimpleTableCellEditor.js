@@ -8,9 +8,9 @@ class SimpleTableCellEdition {
 
     constructor(elem, _cellParams) {
 
-        this.Elem = elem;
+        this.Elem       = elem;
         this.oldContent = $(elem).html();
-        this.oldValue = _cellParams.internals.extractValue(elem);
+        this.oldValue   = _cellParams.internals.extractValue(elem);
         this.cellParams = _cellParams;
     }
 
@@ -31,14 +31,10 @@ class SimpleTableCellEditor {
         // Add collection for the classes for processing later
         _instance.editableClasses = [];
 
-        if (typeof _tableId === 'undefined')
-            _tableId = "table";
-
-        this.active = true;
-        this.tableId = _tableId; //Store the tableId (One CellEditor must be instantiated for each table)
-
-        this.params = _instance._GetExtendedEditorParams(_params); //Load default params over given ones
-        this.CellEdition = null; //CellEdition contains the current edited cell
+        this.tableId        = _tableId ? _tableId : 'table' 
+        this.active         = true;
+        this.params         = _instance._GetExtendedEditorParams(_params); //Load default params over given ones
+        this.CellEdition    = null; //CellEdition contains the current edited cell
 
         //If DataTable : Handling DataTable reload event
         this._TryHandleDataTableReloadEvent();
@@ -57,9 +53,6 @@ class SimpleTableCellEditor {
     }
 
 
-
-
-
     SetEditable(elem, _cellParams, excludeClass="uneditable") {
 
         var _instance = this;
@@ -73,21 +66,17 @@ class SimpleTableCellEditor {
         //If click on td (not already in edit ones)
         $(elem).on('click', function (evt) {
 
-            if(!_instance.active) {
-                return
-            }
+            if(!_instance.active) 
+                return;
+            
+            if ( $(this).hasClass(_instance.params.inEditClass) ) 
+                return;
 
-            if ( $(this).hasClass(_instance.params.inEditClass) ) {
-                return
-            }
+            if ( $(this).hasClass(excludeClass) ) 
+                return;
 
-            if ( $(this).hasClass(excludeClass) ) {
+            if ( $(this).closest('table').hasClass(excludeClass) ) 
                 return
-            }
-
-            if ( $(this).closest('table').hasClass(excludeClass) ) {
-                return
-            }
 
             _instance._EditCell(this, cellParams);
 
@@ -107,10 +96,6 @@ class SimpleTableCellEditor {
         });
 
     }
-
-
-
-
 
 
     SetEditableClass(editableClass, _cellParams) {
@@ -167,7 +152,6 @@ class SimpleTableCellEditor {
 
         // Only run arrow or tab logic if navigation is enabled and there is at least one editableClasses
         if ((_instance.params.navigation && _instance.editableClasses.length !== 0) || _instance.tableId == "table") {
-            console.log('which:', which)
             // Get arrow key behavior
             if (cellParams.behaviour.arrowKeyCauseCursorMove && shift) {
                 if (which === 39)
@@ -192,12 +176,12 @@ class SimpleTableCellEditor {
             if (moveNext || movePrevious || moveDown || moveUp) {
                 event.preventDefault()
                 if (_instance.tableId == "table") {
+                    //if _instance.tableId is set to 'table', make navigation act on all td-tags
                     var $tableElementsArray = $(elem).closest('table').find('td')
                 }
                 else {
                     var $tableElementsArray = $(elem).closest('table').find(_instance.editableClasses.join(','))
                 }
-
 
                 //TODO: Optimize the creation of $visibleBoxes
                 var visibleBoxes = []
