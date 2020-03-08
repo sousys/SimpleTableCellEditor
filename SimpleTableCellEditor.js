@@ -57,7 +57,10 @@ class SimpleTableCellEditor {
     }
 
 
-    SetEditable(elem, _cellParams) {
+
+
+
+    SetEditable(elem, _cellParams, excludeClass="uneditable") {
 
         var _instance = this;
 
@@ -66,14 +69,25 @@ class SimpleTableCellEditor {
 
         var cellParams = _instance._GetExtendedCellParams(_cellParams);
 
+
         //If click on td (not already in edit ones)
         $(elem).on('click', function (evt) {
 
-            if(!_instance.active)
-                return;
+            if(!_instance.active) {
+                return
+            }
 
-            if ($(this).hasClass(_instance.params.inEditClass))
-                return;
+            if ( $(this).hasClass(_instance.params.inEditClass) ) {
+                return
+            }
+
+            if ( $(this).hasClass(excludeClass) ) {
+                return
+            }
+
+            if ( $(this).closest('table').hasClass(excludeClass) ) {
+                return
+            }
 
             _instance._EditCell(this, cellParams);
 
@@ -93,6 +107,11 @@ class SimpleTableCellEditor {
         });
 
     }
+
+
+
+
+
 
     SetEditableClass(editableClass, _cellParams) {
 
@@ -147,8 +166,8 @@ class SimpleTableCellEditor {
         var moveUp = false
 
         // Only run arrow or tab logic if navigation is enabled and there is at least one editableClasses
-        if (_instance.params.navigation && _instance.editableClasses.length !== 0) {
-
+        if ((_instance.params.navigation && _instance.editableClasses.length !== 0) || _instance.tableId == "table") {
+            console.log('which:', which)
             // Get arrow key behavior
             if (cellParams.behaviour.arrowKeyCauseCursorMove && shift) {
                 if (which === 39)
@@ -172,7 +191,13 @@ class SimpleTableCellEditor {
 
             if (moveNext || movePrevious || moveDown || moveUp) {
                 event.preventDefault()
-                var $tableElementsArray = $(elem).closest('table').find(_instance.editableClasses.join(','))
+                if (_instance.tableId == "table") {
+                    var $tableElementsArray = $(elem).closest('table').find('td')
+                }
+                else {
+                    var $tableElementsArray = $(elem).closest('table').find(_instance.editableClasses.join(','))
+                }
+
 
                 //TODO: Optimize the creation of $visibleBoxes
                 var visibleBoxes = []
