@@ -491,16 +491,32 @@ class SimpleTableCellEditor {
         return {
             renderValue: (elem, formattedNewVal) => { $(elem).text(formattedNewVal); },
             renderEditor: (elem, oldVal) => {
-                $(elem).html(`<input type='text' style="width:100%; max-width:none">`);
-                //Focus part
-                var input = $(elem).find('input');
+                
+                let input = $('<input>')
+                    .prop({
+                        type: "text",
+                        placeholder: oldVal
+                    })
+                    .css({
+                        "width": "100%",
+                        "max-width": "none"
+                    })
+
+                $(elem).html(input);
                 input.focus();
-                input.val(oldVal);
             },
-            extractEditorValue: (elem) => { return $(elem).find('input').val(); },
+            extractEditorValue: (elem) => {
+
+                let val = $(elem).find('input').val()
+                if (val) {
+                    return val
+                }
+                else {
+                    return $(elem).find('input').prop('placeholder')
+                }
+            },
             extractValue: (elem) => { return $(elem).text(); }
         };
-
     }
 
 
